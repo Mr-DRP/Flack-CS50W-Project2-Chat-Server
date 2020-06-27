@@ -1,20 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const request = new XMLHttpRequest();
-    request.open("POST", "/listmessages");
-
-    // Callback function for when request completes
-    request.onload = () => {
-        const data = JSON.parse(request.responseText);
-        let mesg = data["message"];
-        for (var index in mesg) {
-            var template = Handlebars.templates.message;
-            var msg = template({ message: mesg[index].message, author: mesg[index].user, time: mesg[index].time })
-            document.querySelector('#chatBox').insertAdjacentHTML('beforeend', msg);
-        }
-    };
-    request.send();
-
     var element = document.getElementById("chatBox");
     element.scrollTop = element.scrollHeight;
     $("#sidebar").mCustomScrollbar({
@@ -33,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         $('a[aria-expanded=true]').attr('aria-expanded', 'false');
     });
 
-    
+
     function sendMsg() {
         var message = document.getElementById("messageId").value;
         if (message.length == 0) {
@@ -54,6 +39,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
     socket.on('connect', () => {
+        const request = new XMLHttpRequest();
+        request.open("POST", "/listmessages");
+
+        // Callback function for when request completes
+        request.onload = () => {
+            const data = JSON.parse(request.responseText);
+            let mesg = data["message"];
+            for (var index in mesg) {
+                var template = Handlebars.templates.message;
+                var msg = template({ message: mesg[index].message, author: mesg[index].user, time: mesg[index].time })
+                document.querySelector('#chatBox').insertAdjacentHTML('beforeend', msg);
+            }
+        };
+        request.send();
         sendMessage.onclick = sendMsg;
         var send = document.getElementById("messageId");
         send.addEventListener('keydown', function onEvent(event) {
@@ -84,9 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#channelList').append(li);
     });
 
-    socket.on('error create', data =>{
+    socket.on('error create', data => {
         var div = document.createElement("div");
-        div.setAttribute('class','alert alert-danger');
+        div.setAttribute('class', 'alert alert-danger');
         div.innerText = data.message;
         let el = document.getElementById('channelForm');
         let parentdiv = el.parentNode;
