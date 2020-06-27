@@ -29,9 +29,12 @@ def index():
         #print(usernames)
         return redirect(url_for('index'))
     if "username" in session:
-        if session['channel']:
-            return redirect(url_for('channel',channelName=session['channel']))
-    return render_template('index.html', chatrooms = chatroom, active = 'general')
+        if session['channel'] in chatroom:
+            channelName = session['channel']
+        else:
+            channelName = 'general'
+        return redirect(url_for('channel',channelName= channelName))
+    return render_template('index.html', chatrooms = chatroom)
 
 @app.route('/logout')
 def logout():
@@ -40,9 +43,12 @@ def logout():
 
 @app.route('/channel/<channelName>', methods=['GET', 'POST'])
 def channel(channelName):
+    if session['username'] not in usernames:
+        usernames.append(session['username'])
     if channelName not in chatroom:
         abort(404)
     session['channel'] = channelName
+    print(usernames)
     return render_template('index.html', chatrooms = chatroom, active = channelName)
     
 @app.route('/listmessages', methods=['POST'])
