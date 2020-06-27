@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         $('a[aria-expanded=true]').attr('aria-expanded', 'false');
     });
 
-    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+    var socket = io.connect();
     function sendMsg() {
         var message = document.getElementById("messageId").value;
         if (message.length == 0) {
