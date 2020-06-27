@@ -24,6 +24,7 @@
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js"
         integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY"
         crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 
 </head>
 
@@ -39,119 +40,87 @@
             </div>
 
             <div class="sidebar-header">
-                <h3>*UserName</h3>
+                <h3>{{session['username']}}</h3>
             </div>
-            <form class="m-2">
-                <div class="form-group">
-                    <span>#Channel Name</span>
-                    <input class="form-control m-auto" type="text">
-                </div>
+            <div class="form-group m-2">
+                <span>#Channel Name</span>
+                <input class="form-control mb-1" id="channelName" type="text">
+                <button type="submit" id="channelCreate" class="btn btn-white">Create</button>
+            </div>
 
-                <button type="submit" class="btn btn-white">Create</button>
-            </form>
 
-            <ul class="list-unstyled components">
+            <ul id="channelList" class="list-unstyled components">
+                {% for chatroom in chatrooms %}
+                {% if chatroom == active %}
                 <li class="active">
-                    <a href="#homeSubmenu">Channel List</a>
-
-                </li>
+                    {% else %}
                 <li>
-                    <a href="#homeSubmenu">Channel List</a>
+                    {% endif %}
+                    <a href="/channel/{{chatroom}}">#{{chatroom}}</a>
 
                 </li>
-                
+                {% endfor %}
+
             </ul>
 
         </nav>
         <!-- Page Content  -->
-        
+
         <div id="content">
             <nav class="navbar navbar-expanded-sm navbar-light bg-light mb-3">
                 <div class="container-fluid">
-    
-    
-                    <button type="button" id="sidebarCollapse" class="btn" style="color: white; background-color: #6d7fcc;
+
+
+                    <button type="button" id="sidebarCollapse" class="btn mr-1" style="color: white; background-color: #6d7fcc;
                     border-color: #6d7fcc;">
                         <i class="fas fa-align-left"></i>
                     </button>
-    
+
+                    {% if session['username'] %}
+
+                    Welcome, <strong>{{session['username']}}</strong>
+
                     <ul class="nav navbar-nav ml-auto">
                         <li class="nav-item active">
-                            <a class="nav-link" href="#">Logout</a>
+                            <a class="nav-link" href="/logout">Logout</a>
                         </li>
                     </ul>
-    
-    
-    
-    
+                    {% endif %}
+
+
+
+
                 </div>
             </nav>
             <div class="container overflow-auto border" id="chatBox" style="overflow-y: scroll; height:70vh;">
-                <div class="outgoing_msg">
-                    <div class="sent_msg">
-                        <p>This is test message</p>
-                        <span class="time_date"> 11:01 AM | Today</span>
-                    </div>
-                </div>
-                <div class="incoming_msg">
-                    <div class="received_msg">
-                        <div class="received_withd_msg">
-                            <p>Cool!! Nice one</p>
-                            <span class="time_date"> 11:01 AM | Yesterday</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="outgoing_msg">
-                    <div class="sent_msg">
-                        <p>This is test message</p>
-                        <span class="time_date"> 11:01 AM | Today</span>
-                    </div>
-                </div>
-                <div class="incoming_msg">
-                    <div class="received_msg">
-                        <div class="received_withd_msg">
-                            <p>Cool!! Nice one</p>
-                            <span class="time_date"> 11:01 AM | Yesterday</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="outgoing_msg">
-                    <div class="sent_msg">
-                        <p>This is test message</p>
-                        <span class="time_date"> 11:01 AM | Today</span>
-                    </div>
-                </div>
-                <div class="incoming_msg">
-                    <div class="received_msg">
-                        <div class="received_withd_msg">
-                            <p>Cool!! Nice one</p>
-                            <span class="time_date"> 11:01 AM | Yesterday</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="outgoing_msg">
-                    <div class="sent_msg">
-                        <p>This is test message</p>
-                        <span class="time_date"> 11:01 AM | Today</span>
-                    </div>
-                </div>
-                <div class="incoming_msg">
-                    <div class="received_msg">
-                        <div class="received_withd_msg">
-                            <p>Cool!! Nice one</p>
-                            <span class="time_date"> 11:01 AM | Yesterday</span>
-                        </div>
-                    </div>
-                </div>
+
             </div>
+
             <div class="container border">
 
                 <div class="type_msg">
                     <div class="input_msg_write">
-                        <input type="text" class="write_msg" placeholder="Type a message" />
-                        <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane"
-                                aria-hidden="true"></i></button>
+                        <input type="text" class="write_msg" id="messageId" placeholder="Type a message" />
+                        <button id="sendMessage" class="msg_send_btn" type="button" onclick="sendMessage()"><i
+                                class="fa fa-paper-plane" aria-hidden="true"></i></button>
                     </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="modal fade bd-example-modal-sm" id="myModal" tabindex="-1" role="dialog"
+        aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form action="/" method="POST">
+                        <input type="text" name="username" class="form-control m-1" placeholder="Enter Username"
+                            required>
+                        <button type="submit" class="btn btn-primary" id="setUser">Login</button>
+                    </form>
+
                 </div>
 
             </div>
@@ -159,7 +128,6 @@
     </div>
 
     <div class="overlay"></div>
-
     <!-- jQuery CDN - Slim version (=without AJAX) -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -176,27 +144,17 @@
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
 
-    <script type="text/javascript">
-        $(document).ready(function () {
-            var element = document.getElementById("chatBox");
-            element.scrollTop = element.scrollHeight;
-            $("#sidebar").mCustomScrollbar({
-                theme: "minimal"
-            });
+    <script src="../static/js/handlebars.runtime-v4.7.6.js"></script>
+    <script src="../static/js/message.js"></script>
 
-            $('#dismiss, .overlay').on('click', function () {
-                $('#sidebar').removeClass('active');
-                $('.overlay').removeClass('active');
-            });
-
-            $('#sidebarCollapse').on('click', function () {
-                $('#sidebar').addClass('active');
-                $('.overlay').addClass('active');
-                $('.collapse.in').toggleClass('in');
-                $('a[aria-expanded=true]').attr('aria-expanded', 'false');
-            });
-        });
+    {% if session['username'] is not defined %}
+    <script>
+        $('#myModal').modal({ backdrop: 'static', keyboard: false })
     </script>
+    {% else %}
+    <script src="../static/js/chat.js"></script>
+    {% endif %}
+
 </body>
 
 </html>
