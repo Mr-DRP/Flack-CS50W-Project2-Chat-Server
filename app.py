@@ -43,8 +43,9 @@ def logout():
 
 @app.route('/channel/<channelName>', methods=['GET', 'POST'])
 def channel(channelName):
-    if session['username'] not in usernames:
-        usernames.append(session['username'])
+    if "username" in session:
+        if session['username'] not in usernames:
+            usernames.append(session['username'])
     if channelName not in chatroom:
         abort(404)
     session['channel'] = channelName
