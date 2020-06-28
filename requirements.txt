@@ -19,4 +19,4 @@ toml==0.10.1
 Werkzeug==1.0.1
 wrapt==1.12.1
 gunicorn==20.0.4
-gevent-socketio==0.3.6
+python-socketio==4.6.0
