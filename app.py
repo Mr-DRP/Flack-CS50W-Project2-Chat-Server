@@ -82,3 +82,6 @@ def channelcreate(data):
         chatroom.append(channel)
         messagedict[channel] = []
         emit('channel create', {"channelname":channel}, broadcast=True)
+
+if __name__ == "__main__":
+  socketio.run(app)
