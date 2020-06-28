@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Callback function for when request completes
         request.onload = () => {
             const data = JSON.parse(request.responseText);
+            localStorage.setItem("chat_id", data["channel"]);
             let mesg = data["message"];
             for (var index in mesg) {
                 var template = Handlebars.templates.message;
@@ -70,11 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     socket.on('received message', data => {
-        var template = Handlebars.templates.message;
-        var msg = template({ message: data.message, author: data.user, time: data.time })
-        document.querySelector('#chatBox').insertAdjacentHTML('beforeend', msg);
-        var element = document.getElementById("chatBox");
-        element.scrollTop = element.scrollHeight;
+        if (data['channel'] === localStorage.chat_id) {
+            var template = Handlebars.templates.message;
+            var msg = template({ message: data.message, author: data.user, time: data.time })
+            document.querySelector('#chatBox').insertAdjacentHTML('beforeend', msg);
+            var element = document.getElementById("chatBox");
+            element.scrollTop = element.scrollHeight;
+        }
     });
 
     socket.on('channel create', data => {

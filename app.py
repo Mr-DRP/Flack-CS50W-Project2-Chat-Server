@@ -71,7 +71,7 @@ def message(data):
         del messagelist[0]
     messagelist.append(msg)
     #print(messagedict)
-    emit('received message', {"message": message,"time": time, "user": user}, broadcast=True)
+    emit('received message', {"message": message,"time": time, "user": user, "channel": session['channel']}, broadcast=True)
 
 @socketio.on('createChannel')
 def channelcreate(data):
@@ -81,4 +81,4 @@ def channelcreate(data):
     else:
         chatroom.append(channel)
         messagedict[channel] = []
-        emit('channel create', {"channelname":channel})
+        emit('channel create', {"channelname":channel}, broadcast=True)
