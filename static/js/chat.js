@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("channelName").value = null;
     };
 
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var socket = io.connect('https://' + document.domain + ':' + location.port);
     socket.on('connect', () => {
         const request = new XMLHttpRequest();
         request.open("POST", "/listmessages");
